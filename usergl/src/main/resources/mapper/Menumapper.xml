@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.usergl.mapper.MenuMapper">
+    <!--    public Employee getEmpById(Integer id);
+     public void insertEmp(Employee employee);-->
+    <!--resultType是返回值类型-->
+    <!-- 查询所有 -->
+
+
+
+    <!--    <insert id="adduserList" parameterType="com.sie.usergl.vo.SieUser">-->
+    <!--        insert into sie_user(id,username,`password`,nickname,creatdate,is_delete,`state`,gender,note,email,phone,updatetime) values-->
+    <!--        <foreach collection='list' item='user' separator=',' open='' close=''>-->
+    <!--            ( (select sl from (select COUNT(id)+1 as sl from sie_user) sie_user1),#{user.username},#{user.password},#{user.nickname},#{user.creatdate},#{user.is_delete},#{user.state},#{user.gender},#{user.note},#{user.email},#{user.phone},#{user.updatetime})-->
+    <!--        </foreach>-->
+    <!--    </insert>-->
+
+
+    <update id="deleteMenu" parameterType="com.sie.usergl.vo.SieMenu">
+        update sie_menu set is_delete='1' where id in
+        <foreach collection='list' item='menu' separator=',' open='(' close=')'>
+            #{menu.id}
+        </foreach>
+    </update>
+
+    <update id="stateOn" parameterType="com.sie.usergl.vo.SieMenu">
+        update sie_menu set state='0', updatetime=#{date} where id in
+        <foreach collection='list' item='menu' separator=',' open='(' close=')'>
+            #{menu.id}
+        </foreach>
+    </update>
+
+    <update id="stateOff" parameterType="com.sie.usergl.vo.SieMenu">
+        update sie_menu set state='1' , updatetime=#{date} where id in
+        <foreach collection='list' item='menu' separator=',' open='(' close=')'>
+            #{menu.id}
+        </foreach>
+    </update>
+
+    <select id="findIsDelete" resultType="java.lang.Integer">
+        select count(id) from  sie_menu me where pid in
+        <foreach collection='list' item='menu' separator=',' open='(' close=')'>
+            #{menu.id}
+        </foreach>
+                and id not in
+        <foreach collection='list' item='menu' separator=',' open='(' close=')'>
+            #{menu.id}
+        </foreach>
+            and is_delete='0'
+    </select>
+</mapper>

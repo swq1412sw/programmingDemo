@@ -1,0 +1,63 @@
+
+
+server:
+  port: 8887
+#访问静态资源
+#端口随便写
+
+# 自定义代理相关配置
+# 代理的本地路由
+#proxy:
+#  servletUrl: "/api/*"
+#  # 要代理的地址
+#  targetUrl: "http://127.0.0.1:8887"
+#
+#  servletUrl2: "/socket/*"
+#  # 要代理的地址
+#  targetUrl2: "ws://127.0.0.1:8887"
+
+
+spring:
+  application:
+    name: usergl
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sie_tables?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+  servlet:
+    multipart:
+      max-file-size: 2000MB
+      max-request-size: 2000MB
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+#  jackson:
+#    date-format: yyyy-MM-dd HH:mm:ss
+#    time-zone: GMT+8
+#  redis:
+#    host: 127.0.0.1
+#    password: 123456
+
+mybatis:
+  #配置别名
+  type-aliases-package: com.sie.usergl.vo
+  #找mapper接口对应的xml映射文件
+  mapper-locations: classpath:mapper/*.xml
+  #配置MyBatis的内置配置信息
+  configuration:
+    #配置sql记录日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #开启MyBatis驼峰命名规则
+#    map-underscore-to-camel-case: true
+
+#  配置JWT
+jwt:
+  #  请求头
+  tokenHeader: Authorization
+  #  签名和加盐
+  secret: sssss
+  expiration: 3600
+  #  token的头部
+  tokenhead: 'Bearer '
+

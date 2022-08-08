@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.usergl.mapper.UserMapper">
+    <!--    public Employee getEmpById(Integer id);
+     public void insertEmp(Employee employee);-->
+    <!--resultType是返回值类型-->
+    <!-- 查询所有 -->
+    <select id="userlist" resultType="com.sie.usergl.vo.SieUser">
+        select * from sie_user where BINARY username like #{map.username} and BINARY nickname like #{map.nickname} and gender like #{map.gender} and state like #{map.state} and is_delete='0'
+        <if test="map.start!=null and map.start!=''">
+            and creatdate <![CDATA[>=]]> #{map.start}
+        </if>
+
+        <if test="map.end!=null and map.end!=''">
+            and creatdate <![CDATA[<=]]> #{map.end}
+        </if>
+        order by ID,creatdate
+        limit #{map.total} offset #{map.page}
+    </select>
+
+    <select id="sum" resultType="java.lang.Integer">
+        select count(id) from sie_user where BINARY username like #{map.username} and BINARY nickname like #{map.nickname} and gender like #{map.gender} and state like #{map.state} and is_delete='0'
+        <if test="map.start!=null and map.start!=''">
+            and creatdate <![CDATA[>=]]> #{map.start}
+        </if>
+
+        <if test="map.end!=null and map.end!=''">
+            and creatdate <![CDATA[<=]]> #{map.end}
+        </if>
+
+    </select>
+
+    <select id="findlistname" resultType="com.sie.usergl.vo.SieUser">
+        select *from sie_user where is_delete='0' and BINARY username in
+    <foreach collection="list" item="name" separator="," open="(" close=")">
+        #{name}
+    </foreach>
+    </select>
+
+
+    <insert id="adduserList" parameterType="com.sie.usergl.vo.SieUser">
+        insert into sie_user(id,username,`password`,nickname,creatdate,is_delete,`state`,gender,note,email,phone,updatetime) values
+<foreach collection='list' item='user' separator=',' open='' close=''>
+   ( (select sl from (select  IFNULL(max(id)+1,0) as sl from sie_user) sie_user1),#{user.username},#{user.password},#{user.nickname},#{user.creatdate},#{user.is_delete},#{user.state},#{user.gender},#{user.note},#{user.email},#{user.phone},#{user.updatetime})
+</foreach>
+    </insert>
+
+
+    <update id="deleteuser" parameterType="com.sie.usergl.vo.SieUser">
+        update sie_user set is_delete='1' where id in
+        <foreach collection='list' item='user' separator=',' open='(' close=')'>
+            #{user.id}
+        </foreach>
+    </update>
+
+    <update id="stateon" parameterType="com.sie.usergl.vo.SieUser">
+        update sie_user set state='0', updatetime=#{date} where id in
+        <foreach collection='list' item='user' separator=',' open='(' close=')'>
+            #{user.id}
+        </foreach>
+    </update>
+
+    <update id="stateoff" parameterType="com.sie.usergl.vo.SieUser">
+        update sie_user set state='1', updatetime=#{date} where id in
+        <foreach collection='list' item='user' separator=',' open='(' close=')'>
+            #{user.id}
+        </foreach>
+    </update>
+</mapper>

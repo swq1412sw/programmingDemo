@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sie.usergl.mapper.RoleMapper">
+    <!--    public Employee getEmpById(Integer id);
+     public void insertEmp(Employee employee);-->
+    <!--resultType是返回值类型-->
+    <!-- 查询所有 -->
+    <select id="rolelist" resultType="com.sie.usergl.vo.SieRole">
+        select `id`,rolecode,rolename,effectivedate,expirydate, IF(effectivedate>NOW() or expirydate <![CDATA[<]]>NOW() ,'1','0') as state,creatdate,updatetime,is_delete,note from sie_role where BINARY rolename like #{map.rolename} and IF(effectivedate>NOW() or expirydate<![CDATA[<]]>NOW() ,'1','0') like #{map.state} and is_delete='0'
+        <if test="map.start!=null and map.start!=''">
+            and creatdate <![CDATA[>=]]> #{map.start}
+        </if>
+
+        <if test="map.end!=null and map.end!=''">
+            and creatdate <![CDATA[<=]]> #{map.end}
+        </if>
+        order by creatdate
+        limit #{map.total} offset #{map.page}
+    </select>
+
+    <select id="sum" resultType="java.lang.Integer">
+        select count(id) from sie_role where BINARY rolename like #{map.rolename} and IF(effectivedate>NOW() or expirydate<![CDATA[<]]>NOW() ,'1','0') like #{map.state} and is_delete='0'
+        <if test="map.start!=null and map.start!=''">
+            and creatdate <![CDATA[>=]]> #{map.start}
+        </if>
+
+        <if test="map.end!=null and map.end!=''">
+            and creatdate <![CDATA[<=]]> #{map.end}
+        </if>
+
+    </select>
+<!--    <insert id="adduserList" parameterType="com.sie.usergl.vo.SieUser">-->
+<!--        insert into sie_user(id,username,`password`,nickname,creatdate,is_delete,`state`,gender,note,email,phone,updatetime) values-->
+<!--        <foreach collection='list' item='user' separator=',' open='' close=''>-->
+<!--            ( (select sl from (select COUNT(id)+1 as sl from sie_user) sie_user1),#{user.username},#{user.password},#{user.nickname},#{user.creatdate},#{user.is_delete},#{user.state},#{user.gender},#{user.note},#{user.email},#{user.phone},#{user.updatetime})-->
+<!--        </foreach>-->
+<!--    </insert>-->
+    <select id="findrolesbyid" resultType="java.lang.Integer">
+select  count(id) from sie_user_role where role_id in
+
+        <foreach collection='list' item='role' separator=',' open='(' close=')'>
+            #{role.id}
+        </foreach>
+         and user_id in (select id from sie_user where is_delete='0')
+    </select>
+
+    <update id="deleterole" parameterType="com.sie.usergl.vo.SieRole">
+        update sie_role set is_delete='1' where id in
+        <foreach collection='list' item='role' separator=',' open='(' close=')'>
+            #{role.id}
+        </foreach>
+    </update>
+    <update id="stateon" parameterType="com.sie.usergl.vo.SieRole">
+        update sie_role set updatetime=#{date},effectivedate=#{date},expirydate=null where id in
+        <foreach collection='list' item='role' separator=',' open='(' close=')'>
+            #{role.id}
+        </foreach>
+    </update>
+
+    <update id="stateoff" parameterType="com.sie.usergl.vo.SieRole">
+        update sie_role set updatetime=#{date}, expirydate=#{date} where id in
+        <foreach collection='list' item='role' separator=',' open='(' close=')'>
+            #{role.id}
+        </foreach>
+    </update>
+</mapper>
